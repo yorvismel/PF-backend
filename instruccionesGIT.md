@@ -10,4 +10,4 @@
 8. `git push origin beta` para actualizar los cambios hechos que usted pusheo en su rama y actualizo con git merge a la rama local
    beta ahora con el git push origin beta actualiza el repo en la rama beta para luego hacer un pull request para actualizar main
 9. `git pull origin beta` para actualizar cualquier rama desde la rama beta del repositorio ideal
-   actualizar la rama local beta con la rama del repo beta y luego hacer un git merge desde su rama
+   actualizar la rama local beta con la rama del repo  y luego hacer un git merge desde su rama

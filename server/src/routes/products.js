@@ -1,16 +1,14 @@
-const {Router} = require('express');
+const { Router } = require('express');
 const {
-    getProd, 
-    getProdById, 
-    } = require('../handlers/productshandler');
+  getAllProducts,
+  getProductByIdHandler,
+  createNewProduct, // Agregamos esta línea
+} = require('../handlers/productshandler');
 
 const products = Router();
 
-products.get('/', getProd); //Trae productos
-
-products.get('/:idVideogame', getProdById); //Trae productos por id
-
-
-
+products.get('/', getAllProducts);
+products.get('/:id', getProductByIdHandler);
+products.post('/', createNewProduct); // Agregamos esta línea
 
 module.exports = products;

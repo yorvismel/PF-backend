@@ -19,12 +19,9 @@ module.exports = (sequelize) => {
     },
 
     price: {
-        type: DataTypes.FLOAT,
-        validate: {
-            isFloat: true,
-            min: 0.0,
-        }
-    },
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+      },
 
     description: {
         type: DataTypes.TEXT,
@@ -34,15 +31,13 @@ module.exports = (sequelize) => {
 
     image: {
         type: DataTypes.STRING,
+        allowNull: false,
     },
 
     rating: {
         type: DataTypes.FLOAT,
-        validate: {
-            isFloat: true,
-            max: 5.0,
-            min: 0.0,
-        }
+        allowNull: false,
+
     }
 
     },

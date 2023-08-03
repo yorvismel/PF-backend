@@ -1,30 +1,50 @@
-const {  getProducts, getProductsById } = require('../controllers/products')
+const { getProducts, getProductById, createProduct } = require('../controllers/products');
 
+const getAllProducts = async (req, res) => {
+  const { title } = req.query;
+  try {
+    const products = await getProducts(title);
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
-//traer todos los juegos o traerlos por sus nombres
-const getProd = async (req, res) => {
-    const { name } = req.query
-    try {
-        const products = await getProducts(name);
-        res.status(200).json(products);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+const getProductByIdHandler = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const product = await getProductById(id);
+    if (product) {
+      res.status(200).json(product);
+    } else {
+      res.status(404).json({ error: 'Product not found.' });
     }
-}
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
-// traer juegos por id
-const getProdById = async (req, res) => {
-    const { idProduct } = req.params;
-    const source = isNaN(idProduct) ? 'DB' : 'API';
+const createNewProduct = async (req, res) => {
+    const { title, price, description, image, rating, Category } = req.body;
     try {
-        const productsById = await getProductsById(idProduct, source);
-        res.status(200).json(productsById);
+      // Creamos el nuevo producto
+      const newProduct = await createProduct({
+        title,
+        price,
+        description,
+        image,
+        rating,
+        Category,
+      });
+  
+      res.status(201).json(newProduct);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });
     }
-}
+  };
 
 module.exports = {
-    getProd,
-    getProdById,
-}
+  getAllProducts,
+  getProductByIdHandler,
+  createNewProduct,
+};

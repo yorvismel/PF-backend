@@ -61,8 +61,8 @@ const {
 
   //Relaciones
 
-  Product.belongsToMany(Category, { through: 'VideogameGenre', timestamps : false });
-  Category.belongsToMany(Product, { through: 'VideogameGenre', timestamps : false });
+  Product.belongsToMany(Category, { through: 'ProductCategory', timestamps : false });
+  Category.belongsToMany(Product, { through: 'ProductCategory', timestamps : false });
 
 
  module.exports = {

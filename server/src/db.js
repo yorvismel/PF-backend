@@ -42,7 +42,7 @@ fs.readdirSync(path.join(__dirname, "/models"))
     modelDefiners.push(require(path.join(__dirname, "/models", file)));
   });
 
-modelDefiners.forEach((model) => model(sequelize));
+modelDefiners.forEach(model => model(sequelize));
 
 let entries = Object.entries(sequelize.models);
 let capsEntries = entries.map((entry) => [
@@ -54,29 +54,18 @@ sequelize.models = Object.fromEntries(capsEntries);
 //los models
 
 const {
-    
+    Category,
+    Product
   } = sequelize.models;
 
 
   //Relaciones
 
+  Product.belongsToMany(Category, { through: 'VideogameGenre', timestamps : false });
+  Category.belongsToMany(Product, { through: 'VideogameGenre', timestamps : false });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  module.exports = {
+ module.exports = {
     ...sequelize.models,
     conn: sequelize,
   };

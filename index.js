@@ -7,7 +7,7 @@
    .sync({ force: false })
    .then(() => {
      server.listen(PORT, () => {
-       console.log(`Server listening on port ${PORT}`);
+       console.log(`Backend Funcionando (por ahora)`);
      });
    })
    .catch((error) => console.error(error));

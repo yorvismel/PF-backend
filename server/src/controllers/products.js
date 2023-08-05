@@ -134,13 +134,63 @@ const createProduct = async (productData) => {
   }
 };
 
-module.exports = {
-  createProduct,
+const getProductsByTitleFromAPI = async (title) => {
+  try {
+    const response = await axios.get('https://fakestoreapi.com/products');
+    const products = response.data;
+
+    if (title) {
+      const filteredProducts = products.filter(
+        (product) => product.title.toLowerCase().includes(title.toLowerCase())
+      );
+      return filteredProducts.slice(0, 15);
+    }
+
+    return products;
+  } catch (error) {
+    console.error("Error retrieving products from API:", error);
+    throw error;
+  }
 };
 
+const getProductsByTitleFromDB = async (title) => {
+  try {
+    const productsDb = await Product.findAll({
+      include: Category,
+      where: {
+        title: {
+          [Sequelize.Op.iLike]: `%${title}%`,
+        },
+      },
+    });
+
+    return productsDb.map((prod) => ({
+      id: prod.id,
+      title: prod.title,
+      price: prod.price,
+      description: prod.description,
+      image: prod.image,
+      rating: prod.rating,
+      Category: prod.Category ? prod.Category.name : null,
+    }));
+  } catch (error) {
+    console.error("Error retrieving products from DB:", error);
+    throw error;
+  }
+};
+
+const getProductsByTitle = async (title) => {
+  const productsFromAPI = await getProductsByTitleFromAPI(title);
+  const productsFromDB = await getProductsByTitleFromDB(title);
+
+  const allProducts = [...productsFromAPI, ...productsFromDB];
+  return allProducts.slice(0, 15);
+};
 
 module.exports = {
   getProducts,
   getProductById,
+  getProductsByTitle,
   createProduct,
 };
+

@@ -3,12 +3,9 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const Category = sequelize.define('Category', {
     id: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
       primaryKey: true,
-      defaultValue: DataTypes.UUIDV4,
-      validate: {
-        isUUID: 4,
-      },
+      autoIncrement: true, 
     },
     name: {
       type: DataTypes.STRING,
@@ -16,6 +13,11 @@ module.exports = (sequelize) => {
       unique: true,
     },
   });
+
+  // Asociación con Product
+  Category.associate = (models) => {
+    Category.belongsToMany(models.Product, { through: 'ProductCategory', timestamps: false });
+  };
 
   return Category;
 };

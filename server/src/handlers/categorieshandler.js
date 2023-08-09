@@ -1,4 +1,4 @@
-const { getCategoriesProducts } = require('../controllers/categories')
+const { getCategoriesProducts, createCategory } = require('../controllers/categories')
 
 const getCategories = async (req, res) => {
     try {
@@ -9,6 +9,20 @@ const getCategories = async (req, res) => {
     }
 }
 
+const createNewCategory = async (req, res) => {
+    const { name } = req.body;
+    try {
+      const newCategory = await createCategory(name);
+      res.status(201).json(newCategory);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  };
+
+  ///////////////////////////////
+
+  
+
 module.exports = {
-    getCategories
+    getCategories, createNewCategory
 }

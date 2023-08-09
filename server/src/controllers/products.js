@@ -1,44 +1,31 @@
-const axios = require('axios');
 const { Product, Category } = require('../db');
 
-const getAllProductsFromAPI = async () => {
+const getAllProductsFromDB = async () => {
   try {
-    const response = await axios.get('https://fakestoreapi.com/products');
-    return response.data;
+    const productsDb = await Product.findAll({
+      include: Category,
+    });
+
+    return productsDb.map((prod) => ({
+      id: prod.id,
+      title: prod.title,
+      price: prod.price,
+      description: prod.description,
+      image: prod.image,
+      rating: prod.rating,
+      categories: prod.Categories.map((category) => category.name), // Obtener los nombres de categorías
+    }));
   } catch (error) {
-    console.error("Error retrieving products from API:", error);
+    console.error("Error retrieving products from DB:", error);
     throw error;
   }
 };
 
-const getAllProductsFromDB = async () => {
-    try {
-      const productsDb = await Product.findAll({
-        include: Category,
-      });
-  
-      return productsDb.map((prod) => ({
-        id: prod.id,
-        title: prod.title,
-        price: prod.price,
-        description: prod.description,
-        image: prod.image,
-        rating: prod.rating,
-        Category: prod.Category ? prod.Category.name : null, // Verificar si la categoría existe antes de acceder a su nombre
-      }));
-    } catch (error) {
-      console.error("Error retrieving products from DB:", error);
-      throw error;
-    }
-  };
-  
-
 const getProducts = async (title) => {
   try {
     const productsFromDB = await getAllProductsFromDB();
-    const productsFromAPI = await getAllProductsFromAPI();
 
-    const allProducts = [...productsFromAPI, ...productsFromDB];
+    const allProducts = [...productsFromDB];
 
     if (title) {
       const filteredProducts = allProducts.filter(
@@ -51,16 +38,6 @@ const getProducts = async (title) => {
   } catch (error) {
     console.error("Error retrieving products:", error);
     throw error;
-  }
-};
-
-const getProductByIdFromAPI = async (id) => {
-  try {
-    const response = await axios.get(`https://fakestoreapi.com/products/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error retrieving product from API:", error);
-    return null;
   }
 };
 
@@ -78,7 +55,7 @@ const getProductByIdFromDB = async (id) => {
         description: productDB.description,
         image: productDB.image,
         rating: productDB.rating,
-        Category: productDB.Category.name,
+        categories: productDB.Categories.map((category) => category.name), // Obtener los nombres de categorías
       };
     }
 
@@ -90,65 +67,41 @@ const getProductByIdFromDB = async (id) => {
 };
 
 const getProductById = async (id) => {
-  const productAPI = await getProductByIdFromAPI(id);
-  if (productAPI) {
-    return productAPI;
-  }
-
   return getProductByIdFromDB(id);
 };
 
 const createProduct = async (productData) => {
   try {
-    const { Category: categoryName, ...rest } = productData;
+    const { categories, ...rest } = productData;
 
     let product;
-    if (categoryName) {
-      // Buscar o crear la categoría
-      const [category, created] = await Category.findOrCreate({
-        where: { name: categoryName },
+
+    // Crear el producto primero
+    console.log('Creando producto con datos:', rest);
+    product = await Product.create(rest);
+
+    if (categories && categories.length > 0) {
+      // Buscar las categorías por nombre
+      const categoryInstances = await Category.findAll({
+        where: {
+          name: categories,
+        },
       });
 
-      // Crear el producto y establecer la relación con la categoría
-      product = await Product.create({
-        ...rest,
-        CategoryId: category.id,
-      });
-    } else {
-      // Si no se proporciona categoría, crear solo el producto sin relación
-      product = await Product.create(rest);
+      // Establecer la relación con las categorías
+      await product.setCategories(categoryInstances);
+      console.log('Relación con categorías establecida:', categoryInstances);
     }
 
-    return {
-      id: product.id,
-      title: product.title,
-      price: product.price,
-      description: product.description,
-      image: product.image,
-      rating: product.rating,
-      Category: categoryName || null,
-    };
+    // Recargar el producto para obtener las categorías asociadas
+    product = await Product.findByPk(product.id, {
+      include: Category,
+    });
+    console.log('Producto con categorías:', product);
+
+    return product;
   } catch (error) {
     console.error('Error creating product:', error);
-    throw error;
-  }
-};
-
-const getProductsByTitleFromAPI = async (title) => {
-  try {
-    const response = await axios.get('https://fakestoreapi.com/products');
-    const products = response.data;
-
-    if (title) {
-      const filteredProducts = products.filter(
-        (product) => product.title.toLowerCase().includes(title.toLowerCase())
-      );
-      return filteredProducts.slice(0, 15);
-    }
-
-    return products;
-  } catch (error) {
-    console.error("Error retrieving products from API:", error);
     throw error;
   }
 };
@@ -171,7 +124,7 @@ const getProductsByTitleFromDB = async (title) => {
       description: prod.description,
       image: prod.image,
       rating: prod.rating,
-      Category: prod.Category ? prod.Category.name : null,
+      categories: prod.Categories.map((category) => category.name), // Obtener los nombres de categorías
     }));
   } catch (error) {
     console.error("Error retrieving products from DB:", error);
@@ -180,11 +133,96 @@ const getProductsByTitleFromDB = async (title) => {
 };
 
 const getProductsByTitle = async (title) => {
-  const productsFromAPI = await getProductsByTitleFromAPI(title);
   const productsFromDB = await getProductsByTitleFromDB(title);
 
-  const allProducts = [...productsFromAPI, ...productsFromDB];
+  const allProducts = [...productsFromDB];
   return allProducts.slice(0, 15);
+};
+
+//////////////////////////////
+
+const filterProductsByCategoryFromDB = async (categoryName) => {
+  try {
+    const category = await Category.findOne({
+      where: { name: categoryName },
+      include: Product,
+    });
+
+    if (!category) {
+      return [];
+    }
+
+    return category.Products.map((prod) => ({
+      id: prod.id,
+      title: prod.title,
+      price: prod.price,
+      description: prod.description,
+      image: prod.image,
+      rating: prod.rating,
+      categories: category.name,
+    }));
+  } catch (error) {
+    console.error("Error retrieving products from DB:", error);
+    throw error;
+  }
+};
+
+// Función para filtrar productos por categoría
+const filterProductsByCategory = async (categoryName) => {
+  const productsFromDB = await filterProductsByCategoryFromDB(categoryName);
+
+  const allProducts = [...productsFromDB];
+  return allProducts.slice(0, 15);
+};
+
+// Función para ordenar productos por precio desde la base de datos
+const sortProductsByPriceFromDB = async (order) => {
+  try {
+    const sortOrder = order === 'asc' ? 'ASC' : 'DESC';
+
+    const products = await Product.findAll({
+      include: Category,
+      order: [['price', sortOrder]],
+    });
+
+    return products.map((prod) => ({
+      id: prod.id,
+      title: prod.title,
+      price: prod.price,
+      description: prod.description,
+      image: prod.image,
+      rating: prod.rating,
+      categories: prod.Categories.map((category) => category.name),
+    }));
+  } catch (error) {
+    console.error("Error retrieving products from DB:", error);
+    throw error;
+  }
+};
+
+// Función para ordenar productos por nombre desde la base de datos
+const sortProductsByNameFromDB = async (order) => {
+  try {
+    const sortOrder = order === 'asc' ? 'ASC' : 'DESC';
+
+    const products = await Product.findAll({
+      include: Category,
+      order: [['title', sortOrder]],
+    });
+
+    return products.map((prod) => ({
+      id: prod.id,
+      title: prod.title,
+      price: prod.price,
+      description: prod.description,
+      image: prod.image,
+      rating: prod.rating,
+      categories: prod.Categories.map((category) => category.name),
+    }));
+  } catch (error) {
+    console.error("Error retrieving products from DB:", error);
+    throw error;
+  }
 };
 
 module.exports = {
@@ -192,5 +230,7 @@ module.exports = {
   getProductById,
   getProductsByTitle,
   createProduct,
+  filterProductsByCategory,
+  sortProductsByPriceFromDB,
+  sortProductsByNameFromDB,
 };
-

@@ -8,7 +8,10 @@
     "build": "npm run compile"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^2.1.2",
+    "@stripe/stripe-js": "^2.0.0",
     "axios": "^1.4.0",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
@@ -17,6 +20,7 @@
     "pg": "^8.11.2",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.32.1",
+    "stripe": "^12.17.0",
     "uuid": "^9.0.0"
   }
 }

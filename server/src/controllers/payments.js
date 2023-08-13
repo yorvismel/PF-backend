@@ -18,7 +18,7 @@ const createSession = async (req, res) => {
             // Puedes agregar más metadatos si es necesario
           },
         },
-        unit_amount: item.price * 100, // Precio en centavos (Stripe trabaja con centavos)
+        unit_amount: Math.round( item.price * item.quantity * 100,) // Precio en centavos (Stripe trabaja con centavos)
       },
       quantity: item.quantity,
     }));

@@ -5,26 +5,26 @@ const stripe = new Stripe(STRIPE_SECRET);
 const createSession = async (req, res) => {
   try {
     const cartItems = req.body.cartItems;
-    console.log("Received cart items:", cartItems); // Agregamos un log para verificar los datos recibidos
+    console.log("Received cart items:", cartItems); 
 
     const lineItems = cartItems.map(item => ({
       price_data: {
-        currency: 'usd', // Cambia según tu moneda
+        currency: 'usd',
         product_data: {
-          name: item.title, // Nombre del producto desde el carrito
-          images:[ item.image], // URL de la imagen del producto desde el carrito
+          name: item.title,
+          images:[ item.image], 
           metadata: {
-            product_id: item.id, // Agrega el ID del producto aquí
-            // Puedes agregar más metadatos si es necesario
+            product_id: item.id, 
+            
           },
         },
-        unit_amount: Math.round( item.price * item.quantity * 100,) // Precio en centavos (Stripe trabaja con centavos)
+        unit_amount: Math.round( item.price * item.quantity * 100,) 
       },
       quantity: item.quantity,
     }));
     
 
-    console.log("Constructed line items:", lineItems); // Agregamos un log para verificar los items construidos
+    console.log("Constructed line items:", lineItems); 
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],

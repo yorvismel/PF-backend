@@ -30,8 +30,8 @@ const createSession = async (req, res) => {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: 'http://localhost:5173/payments/success',
-      cancel_url: 'http://localhost:3001/payments/cancel',
+      success_url: '/payments/success',
+      cancel_url: '/payments/cancel',
     });
     console.log("Session ID:", session.id);
 
@@ -44,7 +44,7 @@ const createSession = async (req, res) => {
 };
 
 const paymentsSuccess = (req, res) => {
-  res.redirect('http://localhost:5173/payments/success');
+  res.redirect('/payments/success');
 };
 const paymentsCancel = (req, res) => res.send('Cancel');
 

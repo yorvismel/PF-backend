@@ -36,8 +36,8 @@ app.post("/payments/create-checkout-session", async (req, res) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: "/payments/success", 
-      cancel_url: "/payments/cancel", 
+      success_url: " https://pf-frontend-weld.vercel.app/payments/success", 
+      cancel_url: " https://pf-frontend-weld.vercel.app/payments/cancel", 
     });
 
     res.status(200).json({ sessionId: session.id });

@@ -13,7 +13,7 @@ const router = Router();
 router.use("/categories", categories);
 
 router.use("/products", products);
-router.use('/', payments);
+router.use('/payments', payments);
  router.use('/filter', filtercategorie2)
 
 module.exports = router;

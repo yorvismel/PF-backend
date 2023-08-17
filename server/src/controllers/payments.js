@@ -4,6 +4,8 @@ const stripe = new Stripe(STRIPE_SECRET);
 
 const createSession = async (req, res) => {
   try {
+    console.log("Received POST request to /payments/create-checkout-session");
+    
     const cartItems = req.body.cartItems;
     console.log("Received cart items:", cartItems); 
 
@@ -44,8 +46,13 @@ const createSession = async (req, res) => {
 };
 
 const paymentsSuccess = (req, res) => {
+  console.log("Redirected to /payments/success");
   res.redirect('/payments/success');
 };
-const paymentsCancel = (req, res) => res.send('Cancel');
+
+const paymentsCancel = (req, res) => {
+  console.log("Received request to /cancel-payments");
+  res.send('Cancel');
+};
 
 module.exports = { createSession, paymentsSuccess, paymentsCancel };

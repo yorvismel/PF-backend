@@ -225,6 +225,56 @@ const sortProductsByNameFromDB = async (order) => {
   }
 };
 
+const updateProduct = async (req, res) => {
+  const { id } = req.params;
+  const { title, price, description, image, rating, categories } = req.body;
+
+  try {
+    const existingProduct = await getProductByIdFromDB(id);
+    if (!existingProduct) {
+      return res.status(404).json({ error: 'Product not found.' });
+    }
+
+    existingProduct.title = title;
+    existingProduct.price = price;
+    existingProduct.description = description;
+    existingProduct.image = image;
+    existingProduct.rating = rating;
+
+    if (categories && categories.length > 0) {
+      const categoryInstances = await Category.findAll({
+        where: {
+          name: categories,
+        },
+      });
+      await existingProduct.setCategories(categoryInstances);
+    }
+
+    await existingProduct.save();
+
+    return res.status(200).json(existingProduct);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found.' });
+    }
+
+    await product.destroy();
+
+    return res.status(200).json({ message: 'Product deleted successfully.' });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getProducts,
   getProductById,
@@ -233,4 +283,6 @@ module.exports = {
   filterProductsByCategory,
   sortProductsByPriceFromDB,
   sortProductsByNameFromDB,
+  updateProduct, 
+  deleteProduct, 
 };

@@ -4,7 +4,9 @@ const {
   createProduct,   
   filterProductsByCategory,
   sortProductsByPriceFromDB,
-  sortProductsByNameFromDB, } = require('../controllers/products');
+  sortProductsByNameFromDB,
+  updateProduct, 
+  deleteProduct, } = require('../controllers/products');
 
 const getAllProducts = async (req, res) => {
   const { title } = req.query;
@@ -80,6 +82,36 @@ const sortProductsByName = async (req, res) => {
   }
 };
 
+const updateProductHandler = async (req, res) => {
+  const { id } = req.params;
+  const { title, price, description, image, rating, categories } = req.body;
+
+  try {
+    const updatedProduct = await updateProduct(id, {
+      title,
+      price,
+      description,
+      image,
+      rating,
+      categories,
+    });
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const deleteProductHandler = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await deleteProduct(id);
+    res.status(200).json({ message: 'Product deleted successfully.' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getAllProducts,
   getProductByIdHandler,
@@ -87,4 +119,6 @@ module.exports = {
   getProductsByCategory,
   sortProductsByPrice,
   sortProductsByName,
+  updateProductHandler, // Agregado
+  deleteProductHandler, // Agregado
 };

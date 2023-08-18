@@ -10,14 +10,14 @@ const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, DB_RENDER } = process.env;
 
 
 //Con este trabajan desde su maquina
-  const sequelize = new Sequelize(
-      `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`,
-      {
-        logging: false,
-        native: false,
-      }
-    );
-
+console.log(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`);
+const sequelize = new Sequelize(
+  `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`,
+  {
+    logging: false,
+    native: false,
+  }
+);
 
 
   //Con esta cuando ya este deployada

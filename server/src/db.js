@@ -10,25 +10,25 @@ const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, DB_RENDER } = process.env;
 
 
 //Con este trabajan desde su maquina
-console.log(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`);
-const sequelize = new Sequelize(
-  `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`,
-  {
-    logging: false,
-    native: false,
-  }
-);
+// console.log(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`);
+// const sequelize = new Sequelize(
+//   `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`,
+//   {
+//     logging: false,
+//     native: false,
+//   }
+// );
 
 
   //Con esta cuando ya este deployada
   
-//  const sequelize = new Sequelize(DB_RENDER, {
-//    logging: false,
-//       native: false,
-//       dialectOptions: {
-//        //ssl: true, // Deshabilitar la conexión SSL/TLS?
-//       },
-//     });
+  const sequelize = new Sequelize(DB_RENDER, {
+    logging: false,
+       native: false,
+       dialectOptions: {
+        //ssl: true, // Deshabilitar la conexión SSL/TLS?
+       },
+     });
 
 
 const basename = path.basename(__filename);

@@ -47,7 +47,7 @@ const createSession = async (req, res) => {
 
 const paymentsSuccess = (req, res) => {
   console.log("Redirected to /payments/success");
-  res.redirect('/payments/success');
+  res.redirect('https://quickshop-3jbp.onrender.com/payments/success');
 };
 
 const paymentsCancel = (req, res) => {

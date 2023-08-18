@@ -4,8 +4,9 @@ const { Router } = require("express");
 
 const categories = require("./categories");
 const products = require("./products");
-const payments = require('./payments')
-const filtercategorie2 = require("./filtercategories")
+
+const filtercategorie2 = require("./filtercategories");
+const stripeRouter = require("./payments.routes");
 
 const router = Router();
 //router.use('')
@@ -13,7 +14,7 @@ const router = Router();
 router.use("/categories", categories);
 
 router.use("/products", products);
-router.use('/payments', payments);
+router.use("/create-checkout-session", stripeRouter);
  router.use('/filter', filtercategorie2)
 
 module.exports = router;

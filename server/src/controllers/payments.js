@@ -2,9 +2,9 @@ const {STRIPE_SECRET} = process.env
 const Stripe = require('stripe');
 const stripe = new Stripe(STRIPE_SECRET);
 
-const createSession = async (req, res) => {
+const createCheckoutSession = async (req, res) => {
   try {
-    console.log("Received POST request to /payments/create-checkout-session");
+    console.log("Received POST request to /create-checkout-session");
     
     const cartItems = req.body.cartItems;
     console.log("Received cart items:", cartItems); 
@@ -47,7 +47,7 @@ const createSession = async (req, res) => {
 
 const paymentsSuccess = (req, res) => {
   console.log("Redirected to /payments/success");
-  res.redirect('https://quickshop-3jbp.onrender.com/payments/success');
+  res.redirect('/payments/success');
 };
 
 const paymentsCancel = (req, res) => {
@@ -55,4 +55,4 @@ const paymentsCancel = (req, res) => {
   res.send('Cancel');
 };
 
-module.exports = { createSession, paymentsSuccess, paymentsCancel };
+module.exports = { createCheckoutSession, paymentsSuccess, paymentsCancel };

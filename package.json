@@ -4,7 +4,7 @@
   "description": "Server Proyecto Individual",
   "main": "index.js",
   "scripts": {
-    "start": "index.js",
+    "start": "node index.js",
     "build": "npm run compile"
   },
   "dependencies": {

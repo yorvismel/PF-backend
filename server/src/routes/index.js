@@ -6,7 +6,7 @@ const categories = require("./categories");
 const products = require("./products");
 
 const filtercategorie2 = require("./filtercategories");
-const stripeRouter = require("./payments.routes");
+const payments = require('./payments.routes')
 
 const router = Router();
 //router.use('')
@@ -14,7 +14,7 @@ const router = Router();
 router.use("/categories", categories);
 
 router.use("/products", products);
-router.use("/create-checkout-session", stripeRouter);
+router.use('/payments', payments);
  router.use('/filter', filtercategorie2)
 
 module.exports = router;

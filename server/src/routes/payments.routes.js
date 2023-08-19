@@ -1,8 +1,14 @@
-const { Router } = require('express');
-const { createCheckoutSessionHandler } = require('../handlers/payments.handler');
+const {Router} = require('express');
+const {createSession, paymentsSuccess, paymentsCancel } = require('../controllers/payments')
 
-const stripeRouter = Router();
 
-stripeRouter.post('/create-checkout-session', createCheckoutSessionHandler);
+const payments = Router();
 
-module.exports = stripeRouter;
+payments.post('/create-checkout-session', createSession);
+// payments.get('/create-checkout-session', createSession);
+payments.get('/payments/success', paymentsSuccess );
+payments.get('/cancel-payments', paymentsCancel);
+
+
+
+module.exports = payments

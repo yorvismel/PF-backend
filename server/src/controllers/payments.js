@@ -1,10 +1,9 @@
 const {STRIPE_SECRET} = process.env
 const Stripe = require('stripe');
 const stripe = new Stripe(STRIPE_SECRET);
-
-const createCheckoutSession = async (req, res) => {
+console.log(STRIPE_SECRET);
+const createSession = async (req, res) => {
   try {
-    console.log("Received POST request to /create-checkout-session");
     
     const cartItems = req.body.cartItems;
     console.log("Received cart items:", cartItems); 
@@ -32,8 +31,8 @@ const createCheckoutSession = async (req, res) => {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: '/payments/success',
-      cancel_url: '/payments/cancel',
+      success_url: 'http://localhost:5173/payments/success',
+      cancel_url: 'http://localhost:3001/payments/cancel',
     });
     console.log("Session ID:", session.id);
 
@@ -46,13 +45,8 @@ const createCheckoutSession = async (req, res) => {
 };
 
 const paymentsSuccess = (req, res) => {
-  console.log("Redirected to /payments/success");
-  res.redirect('/payments/success');
+  res.redirect('http://localhost:5173/payments/success');
 };
+const paymentsCancel = (req, res) => res.send('Cancel');
 
-const paymentsCancel = (req, res) => {
-  console.log("Received request to /cancel-payments");
-  res.send('Cancel');
-};
-
-module.exports = { createCheckoutSession, paymentsSuccess, paymentsCancel };
+module.exports = { createSession, paymentsSuccess, paymentsCancel };

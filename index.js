@@ -3,6 +3,7 @@ const server = require("./server/src/server");
 const { conn } = require("./server/src/db");
 const PORT = 3001;
 
+
 conn
   .sync({ force: false })
   .then(() => {

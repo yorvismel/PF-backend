@@ -19,5 +19,5 @@ module.exports = (sequelize) => {
     Category.belongsToMany(models.Product, { through: 'ProductCategory', timestamps: false });
   };
 
-  return Category;
+return Category
 };

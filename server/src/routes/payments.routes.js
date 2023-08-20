@@ -1,14 +1,15 @@
-const {Router} = require('express');
-const {createSession, paymentsSuccess, paymentsCancel } = require('../controllers/payments')
+const { Router } = require('express');
+const {createOrder, successOrder, webhook, failure, pending, } = require('../controllers/payments');
 
+const paymenrouter = Router();
 
-const payments = Router();
+paymenrouter.post('/create-order', createOrder);
 
-payments.post('/create-checkout-session', createSession);
-// payments.get('/create-checkout-session', createSession);
-payments.get('/payments/success', paymentsSuccess );
-payments.get('/cancel-payments', paymentsCancel);
+paymenrouter.get('/success', successOrder);
+paymenrouter.get('/failure', failure );
+paymenrouter.get('/pending', pending );
 
+  paymenrouter.post('/webhook', webhook);
 
+module.exports = paymenrouter;
 
-module.exports = payments

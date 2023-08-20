@@ -1,52 +1,76 @@
-const {STRIPE_SECRET} = process.env
-const Stripe = require('stripe');
-const stripe = new Stripe(STRIPE_SECRET);
-console.log(STRIPE_SECRET);
-const createSession = async (req, res) => {
+const mercadopago = require('mercadopago')
+
+const createOrder = async (req, res) => {
+  console.log("Log de req body del back",req.body);
+  const  payload  = req.body;
+  mercadopago.configure({
+    access_token: 'TEST-1787823041968797-081915-b3e4e0682dd673b9a11112bae533e39d-1454756743'
+  });
+console.log("El payload del back", payload);
+  const itemsForPayment = payload.items.map(item => ({
+    title: item.title,
+    image: item.image,
+    unit_price: item.unit_price,
+    currency_id: 'USD', // Ajusta la moneda según tu caso
+    quantity: item.quantity,
+  }));
+    
+  const result = await mercadopago.preferences.create({
+    items: itemsForPayment,
+    
+
+    // items: [
+    //   {
+    //     title:'Laptops',
+    //     unit_price: 500000,
+    //     currency_id: "COP",
+    //     quantity: 1,
+
+    //   }
+    // ],
+    back_urls: {
+      success:"http://localhost:3001/success",
+      failure:"http://localhost:3001/failure",
+      pending:"http://localhost:3001/pending"
+
+    },
+
+      notification_url: "https://78fd-190-90-86-104.ngrok.io/webhook",   
+  })
+  console.log("Items for payments", itemsForPayment);
+  console.log(result);
+  res.send(result.body);
+}
+
+const successOrder = (req, res) => {
+  res.send('Hola Mundo desde la ruta success');
+}
+
+const webhook = async (req, res) => {
+  const payment = req.query
+
   try {
-    
-    const cartItems = req.body.cartItems;
-    console.log("Received cart items:", cartItems); 
-
-    const lineItems = cartItems.map(item => ({
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: item.title,
-          images:[ item.image], 
-          metadata: {
-            product_id: item.id, 
-            
-          },
-        },
-        unit_amount: Math.round( item.price * item.quantity * 100,) 
-      },
-      quantity: item.quantity,
-    }));
-    
-
-    console.log("Constructed line items:", lineItems); 
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: lineItems,
-      mode: 'payment',
-      success_url: 'http://localhost:5173/payments/success',
-      cancel_url: 'http://localhost:3001/payments/cancel',
-    });
-    console.log("Session ID:", session.id);
-
-    res.status(200).json({ sessionId: session.id });
-    
-  } catch (error) {
-    console.error("Error:", error); // Agregamos un log para mostrar el error específico
-    res.status(500).json({ error: error.message });
+  if (payment.type === "payment") {
+   const data = await mercadopago.payment.findById(payment["data.id"])
+   console.log(data)
   }
-};
+  res.send('Hola Mundo desde la ruta webhook');
+} catch (error) {
+  console.log(error);
+  return res.sendStatus(500).json({error: error.message});
+}
+}
+const failure = (req, res) => {
 
-const paymentsSuccess = (req, res) => {
-  res.redirect('http://localhost:5173/payments/success');
-};
-const paymentsCancel = (req, res) => res.send('Cancel');
+  console.log(req.query);
+  res.send('Hola Mundo desde la ruta failure');
+}
 
-module.exports = { createSession, paymentsSuccess, paymentsCancel };
+const pending = (req, res) => {
+  res.send('Hola Mundo desde la ruta pending');
+}
+
+
+
+
+module.exports = {createOrder, successOrder, webhook, failure, pending}

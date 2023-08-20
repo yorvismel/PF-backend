@@ -4,37 +4,34 @@ const { Sequelize } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
 
-const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, DB_RENDER, DB_PORT } = process.env;
+const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, DB_RENDER } = process.env;
 
 
 
 
 //Con este trabajan desde su maquina
-//   console.log(DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT );
-//   const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-//    host: DB_HOST,
-//    port: DB_PORT,
-//    dialect: 'postgres',
-//  });
+     const sequelize = new Sequelize(
+         `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`,
+         {
+           logging: false,
+           native: false,
+         }
+       );
+
 
 
   //Con esta cuando ya este deployada
-  const sequelize = new Sequelize(DB_RENDER, {
-    logging: false,
-    dialect: 'postgres',
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false 
-      }
-    }
-  });
- 
-  
-  
-  
-  
-  
+//  console.log(DB_RENDER);
+//  const sequelize = new Sequelize(DB_RENDER, {
+//       logging: false,
+//       dialect: 'postgres',
+//       dialectOptions: {
+//         ssl: {
+//           require: true,
+//           rejectUnauthorized: false 
+//         }
+//       }
+//     });
 
 
 const basename = path.basename(__filename);
@@ -63,7 +60,8 @@ sequelize.models = Object.fromEntries(capsEntries);
 
 const {
     Category,
-    Product
+    Product,
+    ReviewProducts,
   } = sequelize.models;
 
 
@@ -72,6 +70,10 @@ const {
   Product.belongsToMany(Category, { through: 'ProductCategory', timestamps : false });
   Category.belongsToMany(Product, { through: 'ProductCategory', timestamps : false });
 
+  //Relacions de 1 a n entre Review y Products
+
+ Product.hasMany(ReviewProducts, { as: "reviewProduct", foreignKey: "idProductReview" });
+ ReviewProducts.belongsTo(Product, {as: "reviewProduct",foreignKey: "idProductReview",});
 
  module.exports = {
     ...sequelize.models,
